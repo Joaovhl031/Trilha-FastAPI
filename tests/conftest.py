@@ -1,11 +1,12 @@
+from datetime import datetime
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
-from datetime import datetime
 
 from fastapizero.app import app
-from fastapizero.models import table_registry, User
+from fastapizero.models import table_registry
 
 
 @pytest.fixture
@@ -23,12 +24,13 @@ def session():
 
     table_registry.metadata.drop_all(engine)
 
-def _mock_db_time(model, time =datetime(2026, 3, 4)):
+
+def _mock_db_time(model, time=datetime(2026, 3, 4)):
     def fake_time_hook(mapper, connection, target):
-        print(target)# .create_at = time)
-    
+        print(target)  # .create_at = time)
+
     event.listen(model, 'before_insert', fake_time_hook)
 
     yield time
-    
+
     event.remove(model, 'before_insert', fake_time_hook)
